@@ -50,11 +50,12 @@
       document.getElementById('loader').style.display = 'block';
       document.getElementById('vysledky').innerHTML = '';
       timer = setTimeout(function() {
-        fetch(API + '?q=' + encodeURIComponent(dotaz))
-          .then(function(r) { return r.json(); })
-          .then(zobraz)
-          .catch(function(err) { chyba(err); });
-      }, 400);
+  document.getElementById('dotaz').blur();
+  fetch(API + '?q=' + encodeURIComponent(dotaz))
+    .then(function(r) { return r.json(); })
+    .then(zobraz)
+    .catch(function(err) { chyba(err); });
+}, 400);
     });
 
     function zobraz(data) {
