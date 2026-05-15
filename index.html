@@ -36,50 +36,63 @@
   </div>
 
   <script>
-    var API = 'https://script.google.com/macros/s/AKfycbw-3p9B6xhXSAFizbAzfLaMFeG17bwxAaEfL08Z3OS-oxTnWMAbQx47y7VgX7FKNuWe/exec';
-    var timer;
+    function normalize(str) {
+  return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
 
-    document.getElementById('dotaz').addEventListener('input', function() {
-      clearTimeout(timer);
-      var dotaz = this.value.trim();
-      if (dotaz.length < 2) {
-        document.getElementById('vysledky').innerHTML = '<div id="placeholder">Začni psát název jídla</div>';
-        document.getElementById('loader').style.display = 'none';
-        return;
-      }
-      document.getElementById('loader').style.display = 'block';
-      document.getElementById('vysledky').innerHTML = '';
-      timer = setTimeout(function() {
-  document.getElementById('dotaz').blur();
-  fetch(API + '?q=' + encodeURIComponent(dotaz))
-    .then(function(r) { return r.json(); })
-    .then(zobraz)
-    .catch(function(err) { chyba(err); });
-}, 700);
-    });
+function zvyrazni(text, dotaz) {
+  var norm = normalize(text);
+  var normDotaz = normalize(dotaz);
+  var idx = norm.indexOf(normDotaz);
+  if (idx === -1) return text;
+  return text.substring(0, idx) + '<b>' + text.substring(idx, idx + dotaz.length) + '</b>' + text.substring(idx + dotaz.length);
+}
 
-    function zobraz(data) {
-      document.getElementById('loader').style.display = 'none';
-      var el = document.getElementById('vysledky');
-      if (!data || !data.length) {
-        el.innerHTML = '<div id="placeholder">Nic nenalezeno</div>';
-        return;
-      }
-      var html = '';
-      for (var i = 0; i < data.length; i++) {
-        var d = data[i];
-        var img = d.url
-          ? '<img src="' + d.url + '" alt="' + d.nazev + '" loading="lazy">'
-          : '<div class="karta-no-img">Bez fotky</div>';
-        html += '<div class="karta">' + img + '<div class="karta-nazev">' + d.nazev + '</div></div>';
-      }
-      el.innerHTML = html;
-    }
+var API = 'https://script.google.com/macros/s/AKfycbw-3p9B6xhXSAFizbAzfLaMFeG17bwxAaEfL08Z3OS-oxTnWMAbQx47y7VgX7FKNuWe/exec';
+var timer;
 
-    function chyba(err) {
-      document.getElementById('loader').style.display = 'none';
-      document.getElementById('vysledky').innerHTML = '<div id="placeholder">Chyba: ' + err.message + '</div>';
-    }
+document.getElementById('dotaz').addEventListener('input', function() {
+  clearTimeout(timer);
+  var dotaz = this.value.trim();
+  if (dotaz.length < 2) {
+    document.getElementById('vysledky').innerHTML = '<div id="placeholder">Začni psát název jídla</div>';
+    document.getElementById('loader').style.display = 'none';
+    return;
+  }
+  document.getElementById('loader').style.display = 'block';
+  document.getElementById('vysledky').innerHTML = '';
+  timer = setTimeout(function() {
+    document.getElementById('dotaz').blur();
+    fetch(API + '?q=' + encodeURIComponent(dotaz))
+      .then(function(r) { return r.json(); })
+      .then(zobraz)
+      .catch(function(err) { chyba(err); });
+  }, 400);
+});
+
+function zobraz(data) {
+  var dotaz = document.getElementById('dotaz').value.trim();
+  document.getElementById('loader').style.display = 'none';
+  var el = document.getElementById('vysledky');
+  if (!data || !data.length) {
+    el.innerHTML = '<div id="placeholder">Nic nenalezeno</div>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < data.length; i++) {
+    var d = data[i];
+    var img = d.url
+      ? '<img src="' + d.url + '" alt="' + d.nazev + '" loading="lazy">'
+      : '<div class="karta-no-img">Bez fotky</div>';
+    html += '<div class="karta">' + img + '<div class="karta-nazev">' + zvyrazni(d.nazev, dotaz) + '</div></div>';
+  }
+  el.innerHTML = html;
+}
+
+function chyba(err) {
+  document.getElementById('loader').style.display = 'none';
+  document.getElementById('vysledky').innerHTML = '<div id="placeholder">Chyba: ' + err.message + '</div>';
+}
   </script>
 </body>
 </html>
