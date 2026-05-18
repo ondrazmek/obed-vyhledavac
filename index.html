@@ -37,7 +37,7 @@
     <div id="placeholder">Začni psát název jídla</div>
   </div>
 
-  <script>
+<script>
 function normalize(str) {
   return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
@@ -74,18 +74,15 @@ document.getElementById('dotaz').addEventListener('input', function() {
   document.getElementById('loader').style.display = 'block';
   document.getElementById('vysledky').innerHTML = '';
   timer = setTimeout(function() {
-  fetch(API + '?q=' + encodeURIComponent(dotaz))
-    .then(function(r) { return r.json(); })
-    .then(zobraz)
-    .catch(function(err) { chyba(err); });
+    fetch(API + '?q=' + encodeURIComponent(dotaz))
+      .then(function(r) { return r.json(); })
+      .then(zobraz)
+      .catch(function(err) { chyba(err); });
   }, 400);
-  
-  setTimeout(function() {
-    document.getElementById('dotaz').blur();
-  }, 2000);
 });
 
 function zobraz(data) {
+  document.getElementById('dotaz').blur();
   var dotaz = document.getElementById('dotaz').value.trim();
   document.getElementById('loader').style.display = 'none';
   var el = document.getElementById('vysledky');
