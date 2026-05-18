@@ -74,12 +74,15 @@ document.getElementById('dotaz').addEventListener('input', function() {
   document.getElementById('loader').style.display = 'block';
   document.getElementById('vysledky').innerHTML = '';
   timer = setTimeout(function() {
+  fetch(API + '?q=' + encodeURIComponent(dotaz))
+    .then(function(r) { return r.json(); })
+    .then(zobraz)
+    .catch(function(err) { chyba(err); });
+  }, 400);
+  
+  setTimeout(function() {
     document.getElementById('dotaz').blur();
-    fetch(API + '?q=' + encodeURIComponent(dotaz))
-      .then(function(r) { return r.json(); })
-      .then(zobraz)
-      .catch(function(err) { chyba(err); });
-  }, 800);
+  }, 2000);
 });
 
 function zobraz(data) {
