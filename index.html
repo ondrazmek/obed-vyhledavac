@@ -78,7 +78,7 @@ document.getElementById('dotaz').addEventListener('input', function() {
       .then(function(r) { return r.json(); })
       .then(zobraz)
       .catch(function(err) { chyba(err); });
-  }, 400);
+  }, 800);
 });
 
 function zobraz(data) {
